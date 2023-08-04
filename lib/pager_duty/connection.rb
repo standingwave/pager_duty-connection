@@ -156,10 +156,12 @@ module PagerDuty
 
         token_arg =
           case token_type
-          when :Token then { token: token }
-          when :Bearer then token
-          else raise ArgumentError, "invalid token_type: #{token_type.inspect}"
-          end
+        when :Token
+          conn.request :token_auth, token
+        when :Bearer
+          conn.request :authorization, 'Bearer', token
+        else raise ArgumentError, "invalid token_type: #{token_type.inspect}"
+        end
         conn.authorization(token_type, token_arg)
 
         conn.use ConvertTimesParametersToISO8601
